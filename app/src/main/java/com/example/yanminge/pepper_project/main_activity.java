@@ -2,6 +2,9 @@ package com.example.yanminge.pepper_project;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.aldebaran.qi.sdk.QiContext;
 import com.aldebaran.qi.sdk.QiSDK;
@@ -9,13 +12,28 @@ import com.aldebaran.qi.sdk.RobotLifecycleCallbacks;
 import com.aldebaran.qi.sdk.builder.SayBuilder;
 import com.aldebaran.qi.sdk.object.conversation.Say;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import com.example.yanminge.pepper_project.OkManager;
+import org.json.JSONObject;
+import okhttp3.OkHttpClient;
+import com.example.yanminge.pepper_project.R;
+
 public class main_activity extends AppCompatActivity implements RobotLifecycleCallbacks {
+    private OkManager manager;
+    private OkHttpClient clients;
+    private String response_data;
+    private TextView conversationView;
+
+    OkManager manager = OKManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity);
         QiSDK.register(this, this);
+        conversationView = (TextView)findViewById(R.id.main_layer);
+
     }
 
     @Override
@@ -28,12 +46,26 @@ public class main_activity extends AppCompatActivity implements RobotLifecycleCa
     @Override
     public void onRobotFocusGained(QiContext qiContext) {
         // Create a new say action.
-        Say say = SayBuilder.with(qiContext) // Create the builder with the context.
-                .withText("Hello hujinghong!") // Set the text to say.
-                .build(); // Build the say action.
+        displayHelloHuman();
+        String jsonpath="https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/8f50bc86-0ba4-4246-b577-400bd262251e?subscription-key=9d60b96ed33a4fbe875f74598b8582cb&staging=true&timezoneOffset=-360&q=%E4%B8%8D%E8%A6%81%E8%BE%A3";
 
+        manager.asyncJsonStringByURL(jsonpath, new OkManager.Fun1() {
+            @Override
+            public void onResponse(String result) {
+                response_data = result;
+            }
+        });
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                conversationView.setText("Good study！");
+            }
+        });
+        Say say = SayBuilder.with(qiContext) // Create the builder with the context.
+                .withText(response_data) // Set the text to say.
+                .build(); // Build the say action.
         // Execute the action.
-        say.run();
+        say.async().run();
     }
 
     @Override
@@ -45,4 +77,14 @@ public class main_activity extends AppCompatActivity implements RobotLifecycleCa
     public void onRobotFocusRefused(String reason) {
         // Nothing here.
     }
+
+    private void displayHelloHuman() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                conversationView.setText("Hello human!");
+            }
+        });
+    }
+
 }
