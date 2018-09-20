@@ -26,7 +26,7 @@ import okhttp3.Response;
  * 封装工具类
  * 这一个类主要将OkHttp3工具类进行封装，用于对数据的传输，包括Spring,Json,img，表单等数据的提交与获取
  */
-class OkManager {
+public class OkManager {
     private OkHttpClient client;
     private volatile static OkManager manager;   //防止多个线程访问时
     private final String TAG = OkManager.class.getSimpleName();  //获得类名
