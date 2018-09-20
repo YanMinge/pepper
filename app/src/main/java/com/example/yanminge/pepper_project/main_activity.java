@@ -43,12 +43,7 @@ public class main_activity extends AppCompatActivity implements RobotLifecycleCa
             @Override
             public void onResponse(String result) {
                 response_data = result;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        conversationView.setText(response_data);
-                    }
-                });
+                conversationView.setText(response_data);
                 Say say = SayBuilder.with(qiContext) // Create the builder with the context.
                         .withText(response_data) // Set the text to say.
                         .build(); // Build the say action.
